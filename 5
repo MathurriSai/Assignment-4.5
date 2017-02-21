@@ -1,0 +1,70 @@
+1. Explain what is checksum and the importance of checksum and how hadoop performs checksum
+
+    Checksum makes sures that there is no change in integrity of file even when there is some change when transmitted from one system to 
+another system by internet or else when two systems are connected via same network.
+    Checksum is used to check whethere both files (transmitted and source file) are same.
+    Checksum is a block which is used to find errors which happens during the storage or transmission process.
+    Their main purpose is to check for data integrity and not data authenticity.
+    Whenever there is a small change in the input the output will produce a change. 
+    When the current input matches the previous checksum value then there is a high probability that the data is not altered or corrupted.
+
+IMPORTANCE OF CHECKSUM:
+    Ensures data integrity for data transmission as well as storage.
+    Data transmission may produce error due to data missing or duplication so that the transmitted data do not match in order to check those
+checksum were used.transmitter and the receiver will check the data and will match them.if they do not match then will produce error.
+    Simple error can be recovered.
+    If the error is not simple then a pacakage will be thrown so that the error need to be rectified or ignored.
+    and it cannot ensure 100% error detection guarantee.
+
+HADOOP PERFORMING CHECKSUM:
+      To calculate checksum one needs hash function and through checksum calculator program.
+      Later it compares the two pogram and makes sure that both are same.MD5 and SHA-1 are two common checksum calculator method but the 
+drawback is if they find two hash same in two different files then they will do checksum.
+      So for security purpose it is referred to use SHA_2 as best.Online checksum calculator is also available but the restriction is they
+dont access large volume/size files.
+    
+-------------------------------------------------------------------------------------------------------------------------------------------
+2. Explain the anatomy of file write to HDFS
+
+    Hadoop has file system which contains name node and data node:
+
+NAME NODE:
+*Namenode will manage the name space of all files and directories an  this information will be stored on local disc in form of two files 
+called namespace image and edit log.
+* It is also known as data node where all the blocks for the present running file will be located but it wil not be a storage block.when the
+system starts the information will be restored.
+
+
+DATA NODE:
+* They work on request of clients when they store block as well retrive block.
+Secondary Namenode: Where its node will not act as name node.Its main function is to avoid the thickening of edit log due to merge between
+namespace image with the edit log.
+
+*Object of Distributed File system will ddo RPC call to the name node which will create a new file system in the fiel system name space
+ and there will not be any blocks associated.
+    -Check List:Te client should have permission to create a file
+    -And the same file shoul not be prsent earlier.
+    -It it does not overcome the above two then it will throw exception.
+*   An object (FSDataOutputStream) will be received form the client when namenode is registered which will turn the DFSOutputStream to
+write the data to communicate with name node and data node.
+* Once the client starts to write then the data packets will get slitted into queue. and the acknowledgement queue will be maintained.
+* Namenode will allocate new blocks for storing of replica.
+* The data streams will store and will retrive the the pipeline and forward by means of pipline from one datanode to another datanode. 
+* Pipeline will be closed after process and packets will be added to data queue meanwhile failed node will be removed and the remaining
+nodes will be only written.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+3. Explain how HDFS handles failures during file write
+
+    A data node will be given when datanode is failed a partial block of the data node will be removed/deleted and it will be sent for recovery.
+    After the failed part is removed tehn the remaining will be written to some other two data nodes in pipeline.
+    It will notice that it is a replica and will cretae another replica since two replica is possible on two different nodes preferably on
+the same rack.
+    While the process of writing it is possible for a multiple datanode to fail at a ime.
+    And dfs.replication.min will succeed until the replication reach the replication factor.
+    And so HDFS has the properties of high reliablility, fault-tolerance, highly-availablity in distributed file-system
+
+
+
+
